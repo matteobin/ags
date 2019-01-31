@@ -348,11 +348,16 @@ void InventoryScreen::RedrawOverItem(Bitmap *ds, int isonitem)
     }
 }
 
+// INNER GAME LOOP - inventory screen. Loop in __actual_invscreen
 bool InventoryScreen::Run()
 {
-    if (ags_kbhit() != 0)
-    {
-        return false; // end inventory screen loop
+    // Run() can be called in a loop, so keep events going.
+    process_pending_events();
+
+    SDL_Event kgn = getTextEventFromQueue();
+    auto keyAvailable = run_service_key_controls(kgn);
+    if (keyAvailable && kgn.type == SDL_KEYDOWN) {
+            return false; // end inventory screen loop
     }
 
         //ags_domouse(DOMOUSE_UPDATE);
@@ -495,6 +500,9 @@ int __actual_invscreen()
 {
     InvScr.Prepare();
     InvScr.break_code = InvScr.Redraw();
+    
+    ags_clear_input_buffer();
+    
     if (InvScr.break_code != 0)
     {
         return InvScr.break_code;
@@ -502,12 +510,12 @@ int __actual_invscreen()
 
     while (InvScr.Run());
 
+    ags_clear_input_buffer();
+    
     if (InvScr.break_code != 0)
     {
         return InvScr.break_code;
     }
-
-    ags_clear_input_buffer();
 
     InvScr.Close();
     return InvScr.toret;

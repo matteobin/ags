@@ -37,22 +37,12 @@ extern IGraphicsDriver *gfxDriver;
 extern AGSPlatformDriver *platform;
 
 void my_fade_in(PALETTE p, int speed) {
-    if (game.color_depth > 1) {
-        set_palette (p);
-
-        play.screen_is_faded_out = 0;
-
-        if (play.no_hicolor_fadein) {
-            return;
-        }
+    if (game.color_depth > 1 && play.no_hicolor_fadein) { 
+        set_palette_range(p, 0, 255, 0);
+    } else {
+        gfxDriver->FadeIn(speed, p, play.fade_to_red, play.fade_to_green, play.fade_to_blue);
     }
-
-    // For software renderer we must reconstruct full game view on virtual screen,
-    // because it could have been filled with blackness since the last fade-out.
-    if (gfxDriver->UsesMemoryBackBuffer())
-        construct_virtual_screen(true);
-
-    gfxDriver->FadeIn(speed, p, play.fade_to_red, play.fade_to_green, play.fade_to_blue);
+    play.screen_is_faded_out = 0;
 }
 
 Bitmap *saved_viewport_bitmap = nullptr;
