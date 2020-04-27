@@ -179,11 +179,12 @@ void GameSetupStructBase::ReadFromFile(Stream *in)
     numgui = in->ReadInt32();
     numcursors = in->ReadInt32();
     GameResolutionType resolution_type = (GameResolutionType)in->ReadInt32();
+    resolution_type = kGameResolution_Custom;
     Size game_size;
     if (resolution_type == kGameResolution_Custom && loaded_game_file_version >= kGameVersion_330)
     {
-        game_size.Width = in->ReadInt32();
-        game_size.Height = in->ReadInt32();
+        game_size.Width = 640;
+        game_size.Height = 360;
     }
     SetDefaultResolution(resolution_type, game_size);
 
